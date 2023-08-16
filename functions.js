@@ -1,6 +1,20 @@
+const { promises: fs } = require('fs');
+
 class CreatorShape {
 
+    constructor() {
+
+        let errorApi = []
+
+        this.errorApi = errorApi
+
+    }
+
+
+
     async callApi(values, nameRoute) {
+
+
 
         let information
         if (nameRoute == "polyanets") {
@@ -8,6 +22,7 @@ class CreatorShape {
                 candidateId: "5df36cd6-9413-4abd-9032-3cb72f649e56",
                 row: values.row,
                 column: values.column
+
             }
         } else if (nameRoute == "soloons") {
             information = {
@@ -35,10 +50,19 @@ class CreatorShape {
             })
         const response = await request.json()
 
+        if (response.reason) {
+            this.errorApi.push({ ...information }, nameRoute)
+
+        }
+
+
+
         console.log(response)
 
 
         await new Promise(resolve => setTimeout(resolve, 500));
+
+
 
     }
 
@@ -58,9 +82,9 @@ class CreatorShape {
         let soLoons = []
         let comETHs = []
 
-        for (let i = 0; i < array.length - 1; i++) {
+        for (let i = 0; i <= array.length - 1; i++) {
 
-            for (let y = 0; y < array[i].length - 1; y++) {
+            for (let y = 0; y <= array[i].length - 1; y++) {
 
                 if (array[i][y].includes("POLYANET")) {
                     polyanet.push({ row: i, column: y })
@@ -75,6 +99,8 @@ class CreatorShape {
                 }
             }
         }
+
+
         return { polyanet: polyanet, soLoons: soLoons, comETHs: comETHs }
     }
 
@@ -93,7 +119,11 @@ class CreatorShape {
                 await this.callApi({ row: i.row, column: i.column, direction: i.direction }, "comeths")
             }
 
+            await fs.writeFile("./error.json", JSON.stringify(this.errorApi, null, 2))
+
+            console.log(this.errorApi)
             console.log('megaverse has been created!!')
+            
         } catch (error) {
             console.log(error)
         }
